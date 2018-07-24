@@ -25,7 +25,7 @@ def dict_to_item_list_with_id(dictionary):
 with open("samples.example.yml", "r") as samplesheet:
     samplesheet_dict = yaml.load(samplesheet)
 
-sample_struct = (nested_dicts_to_lists(samplesheet_dict))
+sample_struct = nested_dicts_to_lists(samplesheet_dict)
 
 with open("output.json", "w") as output_json:
     output_json.write(json.dumps(sample_struct))
