@@ -4,30 +4,28 @@ import yaml
 import json
 
 
+def nested_dicts_to_lists(dictionary):
+    new_dict = dict()
+    for key, value in dictionary.items():
+        if type(value) == dict:
+            new_dict[key] = dict_to_item_list_with_id(value)
+        else:
+            new_dict[key] = value
+    return new_dict
 
-def dict_of_dicts_to_list_of_dicts(dictionary):
 
+def dict_to_item_list_with_id(dictionary):
+    items = []
+    for sub_key, sub_dictionary in dictionary.items():
+        item_dict = dict(id=sub_key, **nested_dicts_to_lists(sub_dictionary))
+        items.append(item_dict)
+    return items
 
 
 with open("samples.example.yml", "r") as samplesheet:
-    samplesheet_dict = yaml.load(samplesheet)["samples"]
-    print(deconstruct_dict(yaml.load(samplesheet)))
-samples = []
+    samplesheet_dict = yaml.load(samplesheet)
 
-for sample in samplesheet_dict.items():
-    print sample
-    sample_dict = dict(id=sample[0])
-    for samplekeys in sample[1].items():
-        sample_dict[samplekeys[0]] = []
-        for librarykeys in samplekeys[1].items():
-            library_dict = dict(id=librarykeys[0])
-            for library in librarykeys[1].items():
-                library_dict[library[0]] = []
-                for readgroupkeys in library[1].items():
-                    readgroup_dict = dict(id=readgroupkeys[0], **readgroupkeys[1])
-                    library_dict[library[0]].append(readgroup_dict)
-            sample_dict[samplekeys[0]].append(library_dict)
-    samples.append(sample_dict)
+sample_struct = (nested_dicts_to_lists(samplesheet_dict))
 
-with open("output.json", "w") as output_file:
-    output_file.write((json.dumps(samples)))
+with open("output.json", "w") as output_json:
+    output_json.write(json.dumps(sample_struct))
